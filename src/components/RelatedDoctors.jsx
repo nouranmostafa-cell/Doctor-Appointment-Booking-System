@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { AppContext } from '../context/AppContext'
+import { useNavigate } from 'react-router-dom'
 
 function RelatedDoctors({ docId, speciality }) {
   const { doctors } = useContext(AppContext)
