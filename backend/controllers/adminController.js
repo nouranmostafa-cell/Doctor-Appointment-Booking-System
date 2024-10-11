@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 const addDoctor = async (req,res) =>{
     try{
         const {name,email,password,speciality,degree,experience,about,fees,address} = req.body ; 
-        //const imageFile = req.file
+        const imageFile = req.file
 
         if(!name||!email||!password||!speciality||!degree||!experience||!about||!fees||!address){
             return res.json({success:false,message:"missing details"})
@@ -24,13 +24,13 @@ const addDoctor = async (req,res) =>{
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password,salt)
 
-        /*const imageUpload = await cloudinary.uploader.upload(imageFile.path,{resource_type:"image"})
-        const imageUrl = imageUpload.secure_url*/
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path,{resource_type:"image"})
+        const imageUrl = imageUpload.secure_url
 
         const doctorData={
             name,
             email,
-            //image:imageUrl,
+            image:imageUrl,
             password:hashedPassword,
             speciality,
             degree,
