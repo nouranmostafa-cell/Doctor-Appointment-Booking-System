@@ -1,82 +1,41 @@
-import { createcontext , createContext, useEffect,useState} from "react";
-import {doctors} from "../assets/assets";
-import axios from 'axios'
-import {toast} from 'react-toastify'
-export const AppContext =createContext()
-const AppContextPovider = (props)=> {
-    const currencySymbol ='$'
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
-    const [doctors, setDoctors] = useState([])
-    const [token,setToken] = useState ( localStorage.getItem('token')?localStorage.getItem('token'):false)
-    const [userData,setUserData] = useState(false)
+import { createContext } from "react";
+import PropTypes from 'prop-types';
 
-   
+export const AppContext = createContext();
 
-    const getDoctorsData = async ()=> {
-        try {
-            const {data} = await axios.get(backendUrl +'/api/doctors/list')
-            if (data.success) {
-                setDoctors(data.doctors)
+const AppContextProvider = (props) => {
+    const currancy = "$";
 
-            } else {
-                toast.error(data.message)
-            }
-            
-            }catch (error) {
-            console.log(error)
-            toast.error(error.message)
-         
-        } 
+    const calculateAge = (dob)=>{
+        const today = new Date()
+        const birthdate = new Date(dob)
+        let age = today.getFullYear() - birthdate.getFullYear()
+        return age
     }
+    const months = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    const loadUserProfileData = async () => {
-        try {
-            const {data} = await axios.get(backendUrl +'/api/users/get-profile', {headers:{token}})
-              if (data.success){
-                setUserData(data.userData)
-            } else {
-                toast.error(data.message)
-            }
-            
-            
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
-            
-        }
-    }
+const slotDateFormat = (slotDate) => {
+    const dateArray = slotDate.split("-");
+    return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2];
+};
 
     const value = {
-      doctors,getDoctorsData,
-      currencySymbol,
-      token,
-      setToken,
-      backendUrl,
-      userData,
-      setUserData,
-      loadUserProfileData,
+        // Add context values here
+        calculateAge,
+        slotDateFormat,
+        currancy
     };
-    useEffect(()=>
-    {
-        getDoctorsData()
-    }, [])
-
-    useEffect(()=>{
-        if (token) {
-              loadUserProfileData()
-            
-        }else ( {
-            setUserData:(false)
-        })
-
-    },[token])
-
 
     return (
         <AppContext.Provider value={value}>
             {props.children}
         </AppContext.Provider>
-    )
+    );
+};
 
-}
-export default AppContextPovider
+// PropTypes validation
+AppContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
+
+export default AppContextProvider;
